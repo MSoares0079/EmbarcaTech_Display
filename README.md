@@ -19,3 +19,6 @@ Também existem funcionalidades aos botões A e B, no qual alteram,respectivamen
 ## Vídeo demonstrativo
 (VS Code)
 https://drive.google.com/file/d/10y0XzDUuFtX6mCoiX_lSLUswvD4173CW/view?usp=sharing
+
+(BitDogLab)
+https://drive.google.com/file/d/11NpK7WCTl2DMWgZshr4UJ95F-Ja20ieI/view?usp=sharing
