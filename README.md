@@ -17,3 +17,5 @@ O código consiste em esperar o usuário digitar uma letra do teclado, no qual �
 Também existem funcionalidades aos botões A e B, no qual alteram,respectivamente, os estados dos LEDs Verde e Azul.
 
 ## Vídeo demonstrativo
+(VS Code)
+https://drive.google.com/file/d/10y0XzDUuFtX6mCoiX_lSLUswvD4173CW/view?usp=sharing
