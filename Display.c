@@ -45,7 +45,7 @@ static char buffer_LED2[50];
 bool cor = true;
 char c;// Várivel que será lida pela USB
 char buffer[1];// Buffer para armazenar a mensagem que será enviada
-
+ssd1306_t ssd;
 int main()
 {
   //Inicializando o PIO
@@ -72,7 +72,7 @@ int main()
   gpio_set_function(I2C_SCL, GPIO_FUNC_I2C); // Set the GPIO pin function to I2C
   gpio_pull_up(I2C_SDA); // Pull up the data line
   gpio_pull_up(I2C_SCL); // Pull up the clock line
-  ssd1306_t ssd; // Inicializa a estrutura do display
+  //ssd1306_t ssd; // Inicializa a estrutura do display
   ssd1306_init(&ssd, WIDTH, HEIGHT, false, endereco, I2C_PORT); // Inicializa o display
   ssd1306_config(&ssd); // Configura o display
   ssd1306_send_data(&ssd); // Envia os dados para o display
@@ -96,9 +96,16 @@ int main()
   // Configuração da interrupção com callback
   gpio_set_irq_enabled_with_callback(botão_A, GPIO_IRQ_EDGE_FALL, true, &gpio_irq_handler);
   gpio_set_irq_enabled(botão_B, GPIO_IRQ_EDGE_FALL,true);
-
-  
-  
+  // Atualiza o conteúdo do display com animações
+  ssd1306_fill(&ssd, cor); // Limpa o display
+  ssd1306_rect(&ssd, 3, 3, 122, 58, !cor, cor); // Desenha um retângulo
+  ssd1306_draw_string(&ssd, "Digite algo:", 8, 10); // Desenha uma string
+  ssd1306_draw_string(&ssd, "LED Verde ", 15, 35); // Desenha uma string
+  ssd1306_draw_string(&ssd, "LED Azul  ", 15, 48); // Desenha uma string
+  sprintf(buffer_LED1, "%s", estado_LED_verde ? "LIG" : "DSL");//Estou usando ON e OFF para caber no display
+  ssd1306_draw_string(&ssd,buffer_LED1,90, 35);
+  sprintf(buffer_LED2, "%s", estado_LED_azul ? "LIG" : "DSL");//Estou usando ON e OFF para caber no display
+  ssd1306_draw_string(&ssd,buffer_LED2,90, 48); 
   while (true)
   {
     if (uart_is_readable(UART_ID)) {
@@ -119,13 +126,10 @@ int main()
                                                     intensidade * lista_de_cores[cont_cor][2]);//Além disso existe a váriavel intensidade que define o brilho
     }
     
-    // Atualiza o conteúdo do display com animações
-    ssd1306_fill(&ssd, cor); // Limpa o display
-    ssd1306_rect(&ssd, 3, 3, 122, 58, !cor, cor); // Desenha um retângulo
-    ssd1306_draw_string(&ssd, "Digite algo:", 8, 10); // Desenha uma string   
-    ssd1306_draw_string(&ssd,buffer,50, 20); // Desenha uma string
-    ssd1306_draw_string(&ssd,buffer_LED1,15, 35);
-    ssd1306_draw_string(&ssd,buffer_LED2,15, 48);        
+      
+    ssd1306_draw_string(&ssd,buffer,50, 20); // Desenha o caractere digitado
+    //ssd1306_draw_string(&ssd,buffer_LED1,15, 35);
+    //ssd1306_draw_string(&ssd,buffer_LED2,15, 48);        
     ssd1306_send_data(&ssd); // Atualiza o display
 
     sleep_ms(100);
@@ -139,17 +143,19 @@ void gpio_irq_handler(uint gpio, uint32_t events){
       if(cont_cor==6){
         cont_cor =0;
       }
-      if(gpio == botão_A){//Botão que decrementa o contador
+      if(gpio == botão_A){//Botão LED VERDE
         estado_LED_verde = !estado_LED_verde;
         gpio_put(LED_VERDE,estado_LED_verde);
-        sprintf(buffer_LED1, "LED Verde %s", estado_LED_verde ? "ON" : "OFF");//Estou usando ON e OFF para caber no display
-        printf("%s\n",buffer_LED1);
+        sprintf(buffer_LED1, "%s", estado_LED_verde ? "LIG" : "DSL");//Estou usando ON e OFF para caber no display
+        printf("LED Verde %s\n",buffer_LED1);
+        ssd1306_draw_string(&ssd,buffer_LED1,90, 35);
         }
-      else if(gpio == botão_B){//Botão que incrementa o contador
+      else if(gpio == botão_B){//Botão LED AZUL
         estado_LED_azul = !estado_LED_azul; 
         gpio_put(LED_AZUL,estado_LED_azul);
-        sprintf(buffer_LED2, "LED azul %s", estado_LED_azul ? "ON" : "OFF");//Estou usando ON e OFF para caber no display
-        printf("%s\n",buffer_LED2);
+        sprintf(buffer_LED2, "%s", estado_LED_azul ? "LIG" : "DSL");//Estou usando ON e OFF para caber no display
+        printf("LED Azul %s\n",buffer_LED2);
+        ssd1306_draw_string(&ssd,buffer_LED2,90, 48); 
       }
   }
 }
